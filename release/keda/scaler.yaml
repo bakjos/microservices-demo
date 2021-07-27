@@ -1,0 +1,24 @@
+apiVersion: keda.sh/v1alpha1                  #  <--- Property value was changed
+kind: ScaledObject
+metadata:                                     #  <--- labels.deploymentName is not needed
+  name: prometheus-fe-scaledobject
+  labels:
+    deploymentName: gfrontend
+spec:
+  scaleTargetRef:
+    name: frontend
+    envSourceContainerName: server
+  pollingInterval: 30
+  cooldownPeriod:  60
+  minReplicaCount: 1
+  maxReplicaCount: 3
+  triggers:
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus.istio-system.svc.cluster.local:9090
+      metricName: request_per_second
+      threshold: '20'
+      query: round(sum(irate(istio_requests_total{app="frontend", reporter="source", response_code != "404", source_version="v1" }[1m])), 0.001)
+      #query: histogram_quantile(0.95, sum(rate(istio_request_duration_milliseconds_bucket { app="frontend", reporter="source",  source_version="v1" }[1m])) by (le))
+
+

@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kong
+  labels:
+    app: kong
+spec:
+  selector:
+    matchLabels:
+      app: kong
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        traffic.sidecar.istio.io/includeInboundPorts: "4242"
+      labels:
+        app: kong
+    spec:
+      securityContext:
+        runAsUser: 1000
+      containers:
+      - name: kong
+        image: kong
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: KONG_DATABASE
+            value: 'off'
+          - name: KONG_LOG_LEVEL
+            value: debug
+          - name: KONG_ADMIN_ACCESS_LOG
+            value: /dev/stdout
+          - name: KONG_PROXY_ERROR_LOG
+            value: /dev/stderr
+          - name: KONG_ADMIN_ERROR_LOG
+            value: /dev/stderr
+          - name: KONG_ADMIN_LISTEN
+            value: '127.0.0.1:8001'
+          - name: KONG_PROXY_LISTEN
+            value: 0.0.0.0:8000,0.0.0.0:8443 ssl
+          - name: KONG_DECLARATIVE_CONFIG
+            value: /kong/kong.yml
+        volumeMounts:
+          - name: kongdeclarative
+            mountPath: /kong
+        ports:
+        - name: data-http
+          containerPort: 8000
+        - name: data-https
+          containerPort: 8443
+        readinessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+      volumes:
+      - name: kongdeclarative
+        configMap:
+          name: kongconfig
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kong
+spec:
+  type: LoadBalancer
+  ports:
+  - name: kong-proxy-http
+    port: 80
+    targetPort: 8000
+    protocol: TCP
+  - name: kong-proxy-https
+    port: 443
+    targetPort: 8443
+    protocol: TCP
+  selector:
+    app: kong
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kongconfig
+data:
+  kong.yml: |
+    _format_version: "1.1"
+    services:
+    - url: "https://mockbin.org/bin/29c2d324-a84e-48fd-bc4a-8656adb3dd16"
+      routes:
+      - paths:
+        - "/api"
+      plugins:
+      - name: basic-auth
+    - url: "http://frontend"
+      routes:
+      - paths:
+        - "/"
+      plugins:
+      - name: rate-limiting
+        config:
+          minute: 30
+          policy: local
+    consumers:
+    - username: kevin
+      basicauth_credentials:
+      - username: kevin
+        password: abc123

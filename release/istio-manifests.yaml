@@ -44,53 +44,314 @@ spec:
   - route:
     - destination:
         host: frontend
-        port:
-          number: 80
+        subset: v1
 ---
 apiVersion: networking.istio.io/v1alpha3
-kind: ServiceEntry
+kind: DestinationRule
 metadata:
-  name: allow-egress-googleapis
+  name: frontend
 spec:
-  hosts:
-  - "accounts.google.com" # Used to get token
-  - "*.googleapis.com"
-  ports:
-  - number: 80
-    protocol: HTTP
-    name: http
-  - number: 443
-    protocol: HTTPS
-    name: https
----
-apiVersion: networking.istio.io/v1alpha3
-kind: ServiceEntry
-metadata:
-  name: allow-egress-google-metadata
-spec:
-  hosts:
-  - metadata.google.internal
-  addresses:
-  - 169.254.169.254 # GCE metadata server
-  ports:
-  - number: 80
-    name: http
-    protocol: HTTP
-  - number: 443
-    name: https
-    protocol: HTTPS
+  host: frontend
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+      app: frontend
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: frontend
+  name: paymentservice
 spec:
   hosts:
-  - "frontend.default.svc.cluster.local"
+  - paymentservice
   http:
   - route:
     - destination:
-        host: frontend
-        port:
-          number: 80
+        host: paymentservice
+        subset: v1
 ---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: paymentservice
+spec:
+  host: paymentservice
+  subsets:
+  - name: v1
+    labels:
+      app: paymentservice
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: checkoutservice
+spec:
+  hosts:
+  - checkoutservice
+  http:
+  - route:
+    - destination:
+        host: checkoutservice
+        subset: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: checkoutservice
+spec:
+  host: checkoutservice
+  subsets:
+  - name: v1
+    labels:
+      app: checkoutservice
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: productcatalogservice
+spec:
+  hosts:
+  - productcatalogservice
+  http:
+  - route:
+    - destination:
+        host: productcatalogservice
+        subset: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: productcatalogservice
+spec:
+  host: productcatalogservice
+  subsets:
+  - name: v1
+    labels:
+      app: productcatalogservice
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: recommendationservice
+spec:
+  hosts:
+  - recommendationservice
+  http:
+  - route:
+    - destination:
+        host: recommendationservice
+        subset: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: recommendationservice
+spec:
+  host: recommendationservice
+  subsets:
+  - name: v1
+    labels:
+      app: recommendationservice
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: adservice
+spec:
+  hosts:
+  - adservice
+  http:
+  - route:
+    - destination:
+        host: adservice
+        subset: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: adservice
+spec:
+  host: adservice
+  subsets:
+  - name: v1
+    labels:
+      app: adservice
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: cartservice
+spec:
+  hosts:
+  - cartservice
+  http:
+  - route:
+    - destination:
+        host: cartservice
+        subset: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: cartservice
+spec:
+  host: cartservice
+  subsets:
+  - name: v1
+    labels:
+      app: cartservice
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: currencyservice
+spec:
+  hosts:
+  - currencyservice
+  http:
+  - route:
+    - destination:
+        host: currencyservice
+        subset: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: currencyservice
+spec:
+  host: currencyservice
+  subsets:
+  - name: v1
+    labels:
+      app: currencyservice
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: emailservice
+spec:
+  hosts:
+  - emailservice
+  http:
+  - route:
+    - destination:
+        host: emailservice
+        subset: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: emailservice
+spec:
+  host: emailservice
+  subsets:
+  - name: v1
+    labels:
+      app: emailservice
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: shippingservice
+spec:
+  hosts:
+  - shippingservice
+  http:
+  - route:
+    - destination:
+        host: shippingservice
+        subset: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: shippingservice
+spec:
+  host: shippingservice
+  subsets:
+  - name: v1
+    labels:
+      app: shippingservice
+
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: redis-cart
+spec:
+  hosts:
+  - redis-cart
+  http:
+  - route:
+    - destination:
+        host: redis-cart
+        subset: v1
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: redis-cart
+spec:
+  host: redis-cart
+  subsets:
+  - name: v1
+    labels:
+      app: redis-cart
+
+
+# ---
+# apiVersion: networking.istio.io/v1alpha3
+# kind: ServiceEntry
+# metadata:
+#   name: allow-egress-googleapis
+# spec:
+#   hosts:
+#   - "accounts.google.com" # Used to get token
+#   - "*.googleapis.com"
+#   ports:
+#   - number: 80
+#     protocol: HTTP
+#     name: http
+#   - number: 443
+#     protocol: HTTPS
+#     name: https
+# ---
+# apiVersion: networking.istio.io/v1alpha3
+# kind: ServiceEntry
+# metadata:
+#   name: allow-egress-google-metadata
+# spec:
+#   hosts:
+#   - metadata.google.internal
+#   addresses:
+#   - 169.254.169.254 # GCE metadata server
+#   ports:
+#   - number: 80
+#     name: http
+#     protocol: HTTP
+#   - number: 443
+#     name: https
+#     protocol: HTTPS
+# ---
+# apiVersion: networking.istio.io/v1alpha3
+# kind: VirtualService
+# metadata:
+#   name: frontend
+# spec:
+#   hosts:
+#   - "frontend.default.svc.cluster.local"
+#   http:
+#   - route:
+#     - destination:
+#         host: frontend
+#         port:
+#           number: 80
+# ---

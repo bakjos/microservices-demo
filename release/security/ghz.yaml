@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ghz
+  labels:
+    app: ghz
+spec:
+  ports:
+  - port: 80
+    name: http
+  selector:
+    app: ghz
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ghz-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ghz
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false" 
+      labels:
+        app: ghz
+    spec:
+      containers:
+      - name: ghz
+        image: bakjos/ghz:latest
+        imagePullPolicy: Always
+        volumeMounts:
+        - mountPath: /app/pb
+          name: demo-pb
+        ports:
+        - containerPort: 80
+          name: http-ghz
+      volumes:
+      - name: demo-pb
+        configMap:
+          name: demo-pb
