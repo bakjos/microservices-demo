@@ -9,9 +9,8 @@ spec:
   - route:
     - destination:
         host: paymentservice
-        subset: v1
+        subset: all
 ---
-
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
@@ -21,10 +20,10 @@ spec:
   trafficPolicy:
     connectionPool:
       tcp:
-        maxConnections: 1
+        maxConnections: 10
       http:
-        http1MaxPendingRequests: 1
-        maxRequestsPerConnection: 1
+        http1MaxPendingRequests: 10
+        maxRequestsPerConnection: 10
     outlierDetection:
       consecutive5xxErrors: 1
       consecutiveGatewayErrors: 1
@@ -32,7 +31,6 @@ spec:
       baseEjectionTime: 3m
       maxEjectionPercent: 100
   subsets:
-  - name: v1
+  - name: all
     labels:
       app: paymentservice
-      version: v1
