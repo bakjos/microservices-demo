@@ -6,7 +6,7 @@ Create the minikube cluster using
 ./1-cluster.sh
 ```
 
-Check the istio pods are running
+Check if the istio pods are running
 
 ```bash
 kubectl get pods -n istio-system
@@ -61,19 +61,19 @@ kubectl apply -n boutique -f ./release/blue-green/frontv1-virtual-service.yaml
 
 ```bash
  kubectl apply -n boutique -f ./release/canary/canary-virtual-service.yaml
- ```
+```
 
 ### Header-based routing
 
 [Split the traffic](./release/route-headers/firefox.yaml) depending on the header if its a firefox browser it will go to the new version and the rest goes to the old version
 
 ```bash
- kubectl apply -n boutique -f ./release/route-headers/firefox.yaml 
+ kubectl apply -n boutique -f ./release/route-headers/firefox.yaml
 ```
 
 ### Fault injection (delay)
 
-[Adds a delay](/release/fault-injection/delay-fault-injection.yaml) of 5 seconds to the productcatalogservice
+[Adds a delay](./release/fault-injection/delay-fault-injection.yaml) of 5 seconds to the productcatalogservice
 
 ```bash
 kubectl apply -n boutique -f ./release/fault-injection/delay-fault-injection.yaml
@@ -226,7 +226,7 @@ kubectl apply -n boutique -f ./release/security/auth-jwt.yaml
 
 TOKEN=$(curl https://raw.githubusercontent.com/istio/istio/release-1.10/security/tools/jwt/samples/demo.jwt -s) && echo "$TOKEN" | cut -d '.' -f2 - | base64 --decode -
 
-kubectl apply -n boutique -f ./release/fortio.yaml 
+kubectl apply -n boutique -f ./release/fortio.yaml
 
 FORTIO_POD=$(kubectl get pod -n boutique| grep fortio | awk '{ print $1 }')
 
@@ -258,13 +258,13 @@ Use kong as [API gateway](./release/kong/kong.yaml) instead of the one provided 
 
 ```bash
 
-kubectl apply -n boutique -f ./release/kong 
+kubectl apply -n boutique -f ./release/kong
 
 open "http://$(kubectl -n boutique get service kong -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):$(kubectl -n boutique get service kong -o jsonpath='{.spec.ports[?(@.name=="http2")].port}')"
 
-curl "http://$(kubectl -n boutique get service kong -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):$(kubectl -n boutique get service kong -o jsonpath='{.spec.ports[?(@.name=="http2")].port}')/api" 
+curl "http://$(kubectl -n boutique get service kong -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):$(kubectl -n boutique get service kong -o jsonpath='{.spec.ports[?(@.name=="http2")].port}')/api"
 
-curl -u kevin:abc123 "http://$(kubectl -n boutique get service kong -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):$(kubectl -n boutique get service kong -o jsonpath='{.spec.ports[?(@.name=="http2")].port}')/api"
+curl -u admin:admin "http://$(kubectl -n boutique get service kong -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):$(kubectl -n boutique get service kong -o jsonpath='{.spec.ports[?(@.name=="http2")].port}')/api"
 
 ```
 
