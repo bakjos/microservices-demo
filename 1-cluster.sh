@@ -12,4 +12,5 @@ kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.10/samp
 
 kubectl create namespace boutique
 
+
 kubectl apply -n boutique -f ./release/kubernetes-manifests.yaml

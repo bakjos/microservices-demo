@@ -1,0 +1,66 @@
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ProxyDefaults
+metadata:
+  name: global
+spec:
+  config:
+    protocol: grpc
+    # envoy_extra_static_clusters_json: "{\"connect_timeout\":\"3.000s\",\"dns_lookup_family\":\"V4_ONLY\",\"lb_policy\":\"ROUND_ROBIN\",\"load_assignment\":{\"cluster_name\":\"datadog_8126\",\"endpoints\":[{\"lb_endpoints\":[{\"endpoint\":{\"address\":{\"socket_address\":{\"address\":\"datadog.apm\",\"port_value\":8126,\"protocol\":\"TCP\"}}}}]}]},\"name\":\"datadog_8126\",\"type\":\"STRICT_DNS\"}"
+    # envoy_tracing_json: "{\"http\":{\"name\":\"envoy.tracers.datadog\",\"typedConfig\":{\"@type\":\"type.googleapis.com/envoy.config.trace.v3.DatadogConfig\",\"collector_cluster\":\"datadog_8126\",\"service_name\":\"envoy\"}}}"
+    envoy_extra_static_clusters_json: "{\"connect_timeout\":\"3.000s\",\"dns_lookup_family\":\"V4_ONLY\",\"lb_policy\":\"ROUND_ROBIN\",\"load_assignment\":{\"cluster_name\":\"zipkin\",\"endpoints\":[{\"lb_endpoints\":[{\"endpoint\":{\"address\":{\"socket_address\":{\"address\":\"otel-collector.commure-system.svc.cluster.local\",\"port_value\":9411,\"protocol\":\"TCP\"}}}}]}]},\"name\":\"zipkin\",\"type\":\"STRICT_DNS\"}"
+    envoy_tracing_json: "{\"http\":{\"name\":\"envoy.tracers.zipkin\",\"typedConfig\":{\"@type\":\"type.googleapis.com/envoy.config.trace.v3.ZipkinConfig\",\"collector_cluster\":\"zipkin\",\"collector_endpoint_version\":\"HTTP_JSON\",\"collector_endpoint\":\"/api/v2/spans\",\"shared_span_context\":false}}}"
+---
+
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: frontend
+spec:
+  protocol: "http"
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: redis-cart
+spec:
+  protocol: "tcp"
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: ServiceDefaults
+metadata:
+  name: locust-test
+spec:
+  protocol: "tcp"
+
+# ---
+# apiVersion: consul.hashicorp.com/v1alpha1
+# kind: IngressGateway
+# metadata:
+#   name: ingress-gateway
+# spec:
+#   tls:
+#     enabled: false
+#   listeners:
+#     - port: 8080
+#       protocol: http
+#       services:
+#         - name: frontend
+#           hosts: ["*"]
+#     # - port: 80
+#     #   protocol: http
+#       # services:
+#       #   - name: api
+#       #     hosts: ['foo.example.com', 'foo.example.com:4567']
+#       #   - name: web
+#       #     hosts: ['website.example.com', 'website.example.com:4567']
+# ---
+# apiVersion: consul.hashicorp.com/v1alpha1
+# kind: ServiceIntentions
+# metadata:
+#   name: frontend
+# spec:
+#   destination:
+#     name: frontend
+#   sources:
+#     - name: ingress-gateway
+#       action: allow

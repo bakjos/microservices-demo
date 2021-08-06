@@ -1,0 +1,7 @@
+loadtest:
+  name: frontend
+  locust_locustfile_configmap: frontend-load-test
+  locust_host: "http://frontend:80" 
+  locust_locustfile: "locustfile.py"
+worker:
+  replicas: 5

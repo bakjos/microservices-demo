@@ -108,7 +108,7 @@ data:
           minute: 30
           policy: local
     consumers:
-    - username: kevin
+    - username: admin
       basicauth_credentials:
-      - username: kevin
-        password: abc123
+      - username: admin
+        password: admin

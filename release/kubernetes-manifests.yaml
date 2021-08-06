@@ -24,6 +24,7 @@ spec:
   selector:
     matchLabels:
       app: emailservice
+  replicas: 3
   template:
     metadata:
       labels:
@@ -31,6 +32,13 @@ spec:
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: node
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: emailservice
       containers:
       - name: server
         image: gcr.io/google-samples/microservices-demo/emailservice:v0.2.4
@@ -80,15 +88,23 @@ spec:
   selector:
     matchLabels:
       app: checkoutservice
+  replicas: 3
   template:
     metadata:
       labels:
         app: checkoutservice
     spec:
       serviceAccountName: default
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: node
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: checkoutservice
       containers:
         - name: server
-          image: gcr.io/google-samples/microservices-demo/checkoutservice:v0.2.4
+          image: bakjos/checkout:v0.2.4 
           ports:
           - containerPort: 5050
           readinessProbe:
@@ -112,14 +128,14 @@ spec:
             value: "currencyservice:7000"
           - name: CART_SERVICE_ADDR
             value: "cartservice:7070"
-          # - name: DISABLE_STATS
-          #   value: "1"
-          # - name: DISABLE_TRACING
-          #   value: "1"
+          - name: DISABLE_STATS
+            value: "1"
+          - name: DISABLE_TRACING
+            value: "1"
           # - name: DISABLE_PROFILER
           #   value: "1"
           - name: JAEGER_SERVICE_ADDR
-            value: "jaeger-collector.istio-system.svc.cluster.local:14268"
+            value: "otel-collector.commure-system.svc.cluster.local:14268"
           resources:
             requests:
               cpu: 100m
@@ -149,6 +165,7 @@ spec:
   selector:
     matchLabels:
       app: recommendationservice
+  replicas: 3
   template:
     metadata:
       labels:
@@ -156,6 +173,13 @@ spec:
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: node
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: recommendationservice
       containers:
       - name: server
         image: gcr.io/google-samples/microservices-demo/recommendationservice:v0.2.4
@@ -174,8 +198,8 @@ spec:
           value: "8080"
         - name: PRODUCT_CATALOG_SERVICE_ADDR
           value: "productcatalogservice:3550"
-        # - name: DISABLE_TRACING
-        #   value: "1"
+        - name: DISABLE_TRACING
+          value: "1"
         # - name: DISABLE_PROFILER
         #   value: "1"
         # - name: DISABLE_DEBUGGER
@@ -209,6 +233,7 @@ spec:
   selector:
     matchLabels:
       app: frontend
+  replicas: 3
   template:
     metadata:
       labels:
@@ -218,9 +243,16 @@ spec:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
     spec:
       serviceAccountName: default
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: node
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: frontend
       containers:
         - name: server
-          image: gcr.io/google-samples/microservices-demo/frontend:v0.2.4
+          image: bakjos/frontend:v0.2.4
           ports:
           - containerPort: 8080
           readinessProbe:
@@ -260,12 +292,12 @@ spec:
           # # When not set, defaults to "local" unless running in GKE, otherwies auto-sets to gcp 
           # - name: ENV_PLATFORM 
           #   value: "aws"
-          # - name: DISABLE_TRACING
-          #   value: "1"
+          - name: DISABLE_TRACING
+            value: "1"
           # - name: DISABLE_PROFILER
           #   value: "1"
-          - name: JAEGER_SERVICE_ADDR
-            value: "jaeger-collector.istio-system.svc.cluster.local:14268"
+          # - name: JAEGER_SERVICE_ADDR
+          #   value: "otel-collector.commure-system.svc.cluster.local:14268"
           resources:
             requests:
               cpu: 100m
@@ -293,7 +325,7 @@ spec:
       serviceAccountName: default
       containers:
         - name: server
-          image: gcr.io/google-samples/microservices-demo/frontend:v0.2.4
+          image: bakjos/frontend:v0.2.4
           ports:
           - containerPort: 8080
           readinessProbe:
@@ -333,12 +365,12 @@ spec:
           # # When not set, defaults to "local" unless running in GKE, otherwies auto-sets to gcp 
           - name: ENV_PLATFORM 
             value: "onprem"
-          # - name: DISABLE_TRACING
-          #   value: "1"
+          - name: DISABLE_TRACING
+            value: "1"
           # - name: DISABLE_PROFILER
           #   value: "1"
           - name: JAEGER_SERVICE_ADDR
-            value: "jaeger-collector.istio-system.svc.cluster.local:14268"
+            value: "otel-collector.commure-system.svc.cluster.local:14268"
           resources:
             requests:
               cpu: 100m
@@ -368,6 +400,7 @@ spec:
   selector:
     matchLabels:
       app: paymentservice
+  replicas: 3
   template:
     metadata:
       labels:
@@ -376,6 +409,13 @@ spec:
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: node
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: paymentservice
       containers:
       - name: server
         image: gcr.io/google-samples/microservices-demo/paymentservice:v0.2.4
@@ -419,6 +459,7 @@ spec:
   selector:
     matchLabels:
       app: productcatalogservice
+  replicas: 3
   template:
     metadata:
       labels:
@@ -426,6 +467,13 @@ spec:
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: node
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: productcatalogservice
       containers:
       - name: server
         image: gcr.io/google-samples/microservices-demo/productcatalogservice:v0.2.4
@@ -434,14 +482,16 @@ spec:
         env:
         - name: PORT
           value: "3550"
-        # - name: DISABLE_STATS
-        #   value: "1"
-        # - name: DISABLE_TRACING
-        #   value: "1"
+        - name: EXTRA_LATENCY
+          value: "120ms"
+        - name: DISABLE_STATS
+          value: "1"
+        - name: DISABLE_TRACING
+          value: "1"
         # - name: DISABLE_PROFILER
         #   value: "1"
         - name: JAEGER_SERVICE_ADDR
-          value: "jaeger-collector.istio-system.svc.cluster.local:14268"
+          value: "otel-collector.commure-system.svc.cluster.local:14268"
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:3550"]
@@ -477,6 +527,7 @@ spec:
   selector:
     matchLabels:
       app: cartservice
+  replicas: 3
   template:
     metadata:
       labels:
@@ -484,6 +535,13 @@ spec:
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: node
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: cartservice
       containers:
       - name: server
         image: gcr.io/google-samples/microservices-demo/cartservice:v0.2.4
@@ -573,6 +631,19 @@ spec:
             cpu: 500m
             memory: 512Mi
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: loadgenerator-service
+spec:
+  type: ClusterIP
+  selector:
+    app: loadgenerator
+  ports:
+  - name: grpc
+    port: 7070
+    targetPort: 7070
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -581,6 +652,7 @@ spec:
   selector:
     matchLabels:
       app: currencyservice
+  replicas: 3
   template:
     metadata:
       labels:
@@ -588,6 +660,13 @@ spec:
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: node
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: currencyservice
       containers:
       - name: server
         image: gcr.io/google-samples/microservices-demo/currencyservice:v0.2.4
@@ -638,28 +717,36 @@ spec:
   selector:
     matchLabels:
       app: shippingservice
+  replicas: 3
   template:
     metadata:
       labels:
         app: shippingservice
     spec:
       serviceAccountName: default
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: node
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: shippingservice
       containers:
       - name: server
-        image: gcr.io/google-samples/microservices-demo/shippingservice:v0.2.4
+        image: bakjos/shippingservice:v0.2.4
         ports:
         - containerPort: 50051
         env:
         - name: PORT
           value: "50051"
-        # - name: DISABLE_STATS
-        #   value: "1"
-        # - name: DISABLE_TRACING
-        #   value: "1"
+        - name: DISABLE_STATS
+          value: "1"
+        - name: DISABLE_TRACING
+          value: "1"
         # - name: DISABLE_PROFILER
         #   value: "1"
         - name: JAEGER_SERVICE_ADDR
-          value: "jaeger-collector.istio-system.svc.cluster.local:14268"
+          value: "otel-collector.commure-system.svc.cluster.local:14268"
         readinessProbe:
           periodSeconds: 5
           exec:
@@ -749,6 +836,7 @@ spec:
   selector:
     matchLabels:
       app: adservice
+  replicas: 3
   template:
     metadata:
       labels:
@@ -756,6 +844,13 @@ spec:
     spec:
       serviceAccountName: default
       terminationGracePeriodSeconds: 5
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: node
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app: adservice
       containers:
       - name: server
         image: gcr.io/google-samples/microservices-demo/adservice:v0.2.4
@@ -764,12 +859,12 @@ spec:
         env:
         - name: PORT
           value: "9555"
-        # - name: DISABLE_STATS
-        #   value: "1"
-        # - name: DISABLE_TRACING
-        #   value: "1"
+        - name: DISABLE_STATS
+          value: "1"
+        - name: DISABLE_TRACING
+          value: "1"
         - name: JAEGER_SERVICE_ADDR
-          value: "jaeger-collector.istio-system.svc.cluster.local:14268"
+          value: "otel-collector.commure-system.svc.cluster.local:14268"
         resources:
           requests:
             cpu: 200m
@@ -800,4 +895,19 @@ spec:
   - name: grpc
     port: 9555
     targetPort: 9555
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: locust-test-workers
+spec:
+  type: ClusterIP
+  selector:
+    component: worker
+    load_test: frontend
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
 ---

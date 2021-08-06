@@ -128,7 +128,7 @@ func initJaegerTracing() {
 	// Register the Jaeger exporter to be able to retrieve
 	// the collected spans.
 	exporter, err := jaeger.NewExporter(jaeger.Options{
-		Endpoint: fmt.Sprintf("http://%s", svcAddr),
+		CollectorEndpoint: fmt.Sprintf("http://%s/api/traces", svcAddr),
 		Process: jaeger.Process{
 			ServiceName: "checkoutservice",
 		},

@@ -16,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"net"
 	"os"
 	"time"
@@ -117,7 +118,11 @@ func (s *server) Watch(req *healthpb.HealthCheckRequest, ws healthpb.Health_Watc
 
 // GetQuote produces a shipping quote (cost) in USD.
 func (s *server) GetQuote(ctx context.Context, in *pb.GetQuoteRequest) (*pb.GetQuoteResponse, error) {
+
+	delay := time.Duration(rand.Intn(250) + 50)
+
 	log.Info("[GetQuote] received request")
+	time.Sleep(delay * time.Millisecond)
 	defer log.Info("[GetQuote] completed request")
 
 	// 1. Our quote system requires the total number of items to be shipped.
@@ -164,7 +169,7 @@ func initJaegerTracing() {
 	// Register the Jaeger exporter to be able to retrieve
 	// the collected spans.
 	exporter, err := jaeger.NewExporter(jaeger.Options{
-		Endpoint: fmt.Sprintf("http://%s", svcAddr),
+		CollectorEndpoint: fmt.Sprintf("http://%s/api/traces", svcAddr),
 		Process: jaeger.Process{
 			ServiceName: "shippingservice",
 		},

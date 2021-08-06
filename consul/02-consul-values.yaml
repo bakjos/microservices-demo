@@ -1,0 +1,63 @@
+global:
+  name: consul
+  datacenter: dc1
+  metrics:
+    enabled: true
+    enableAgentMetrics: true
+    enableGatewayMetrics: true
+    defaultPrometheusScrapePort: 20200
+    defaultPrometheusScrapePath: "/metrics"
+    defaultMergedMetricsPort: 20100
+
+connectInject:
+  enabled: true
+  default: true
+  grpc: true
+  metrics:
+    defaultEnableMerging: true
+    defaultMergedMetricsPort: 20100
+  transparentProxy:
+    defaultEnabled: true
+  centralConfig:
+    enabled: true
+
+controller:
+  enabled: true
+  
+server:
+  enabled: true
+  replicas: 1
+  bootstrapExpect: 1
+  # storageClass: "consul-storage"
+  storage: 2Gi
+
+# client:
+#   enabled: true
+#   grpc: true
+
+# dns:
+#   enabled: true
+
+ui_config:
+  enabled: true
+  metrics_provider: "prometheus"
+  metrics_proxy:
+    base_url: "http://prometheus-server"
+
+prometheus:
+  enabled: true
+
+ingressGateways:
+  enabled: true
+  defaults:
+    # Number of replicas for each ingress gateway defined.
+    replicas: 1
+  gateways:
+    - name: ingress-gateway
+      service:
+        type: LoadBalancer
+
+
+# Sync Kubernetes and Consul services
+#syncCatalog:
+#  enabled: true
